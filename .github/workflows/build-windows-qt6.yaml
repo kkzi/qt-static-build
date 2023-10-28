@@ -59,7 +59,8 @@ jobs:
               shell: pwsh
               run: |
                 cd ${{ inputs.src_dir }}
-                configure.bat -prefix "${{ inputs.install_dir }}" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
+                dir
+                .\configure.bat -prefix "${{ inputs.install_dir }}" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
                 cmake --build . -j
                 cmake --install .
 

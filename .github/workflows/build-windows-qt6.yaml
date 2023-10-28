@@ -7,22 +7,28 @@ on:
                 required: true
                 type: string
                 default: 'dev'
-            configure-args:
-                description: 'Build args'
-                required: true
-                type: string
-            modules:
-                description: 'Build modules'
-                required: true
-                type: string
-                default: 'default'
             arch:
                 description: 'Build arch'
                 type: choice
                 options:
-                  - x86
                   - x64
+                  - x86
                 required: true
+            src_dir:
+                description: 'Download Qt Source Directory'
+                required: true
+                type: string
+                default: 'D:/Qt6/qtbase'
+            install_dir:
+                description: 'Install Qt Libs Directory'
+                required: true
+                type: string
+                default: 'C:/Local/Qt6'
+            configure-args:
+                description: 'Build args'
+                required: false
+                type: string
+
 jobs:
     build:
         name: Build
@@ -38,22 +44,21 @@ jobs:
               working-directory: "C:/"
               shell: pwsh
               run: |
-                mkdir -p C:/Local/qt6-source
-            
+                mkdir -p ${{ inputs.src_dir }}
+                mkdir -p ${{ inputs.install_dir }}
+
             - name: Download Qt
-              working-directory: "C:/Local/qt6-source"
+              working-directory: "${{ inputs.src_dir }}"
               shell: pwsh
               run: | 
-                git clone https://github.com/qt/qtbase.git -b v${{ inputs.version }} C:/Local/qt6-source
-                cd C:/Local/qt6-source
+                git clone https://github.com/qt/qtbase.git -b ${{ inputs.version }} ${{ inputs.src_dir }}
+                cd ${{ inputs.src_dir }}
 
             - name: Build
-              working-directory: "C:/Local/qt6-source"
+              working-directory: "${{ inputs.src_dir }}"
               shell: pwsh
               run: |
-                mkdir build
-                cd build
-                ..\configure.bat -prefix "C:/Local/Qt6" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
+                configure.bat -prefix "${{ inputs.install_dir }}" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
                 cmake --build . -j
                 cmake --install .
 
@@ -61,7 +66,7 @@ jobs:
               working-directory: "D:/"
               shell: pwsh
               run: |
-                7z a -t7z qt-${{inputs.version}}-${{inputs.arch}}-static.7z "C:\Local\Qt6\*"
+                7z a -t7z qt-${{inputs.version}}-${{inputs.arch}}-static.7z "${{ inputs.install_dir }}/*"
 
             - uses: actions/upload-artifact@v3
               with:

@@ -35,11 +35,6 @@ jobs:
         runs-on: windows-2019
 
         steps:
-            - name: Set up Visual Studio shell on Windows
-              uses: egor-tensin/vs-shell@v2
-              with:
-                  arch: ${{ inputs.arch }}
-            
             - name: Setup Environment
               working-directory: "C:/"
               shell: pwsh
@@ -51,9 +46,14 @@ jobs:
               working-directory: "${{ inputs.src_dir }}"
               shell: pwsh
               run: |
-                curl https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -o v${{ inputs.tag }}.zip
+                curl https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -ov${{ inputs.tag }}.zip
                 7z x v${{ inputs.tag }}.zip -y
                 dir
+
+            - name: Set up Visual Studio shell on Windows
+              uses: egor-tensin/vs-shell@v2
+              with:
+                  arch: ${{ inputs.arch }}
 
             - name: Build
               working-directory: "${{ inputs.src_dir }}"

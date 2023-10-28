@@ -37,7 +37,7 @@ jobs:
               run: |
                 mkdir -p ${{ inputs.src_dir }}
                 mkdir -p ${{ inputs.install_dir }}
-                choco install wget unzip
+                choco install -y --no-progress wget unzip
 
             - name: Download Qt
               working-directory: "${{ inputs.src_dir }}"
@@ -45,7 +45,6 @@ jobs:
               run: |
                 wget -qq https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip
                 7z x v${{ inputs.tag }}.zip -y
-                dir
 
             - name: Set up Visual Studio shell on Windows
               uses: egor-tensin/vs-shell@v2
@@ -53,12 +52,12 @@ jobs:
                   arch: ${{ inputs.arch }}
 
             - name: Build
-              working-directory: "${{ inputs.src_dir }}"
+              working-directory: "${{ inputs.src_dir }}/qtbase-${{ inputs.tag }}"
               shell: pwsh
               run: |
-                cd ${{ inputs.src_dir }}
+                cd ${{ inputs.src_dir }}/qtbase-${{ inputs.tag }}
                 dir
-                .\configure.bat -prefix "${{ inputs.install_dir }}" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
+                configure.bat -prefix "${{ inputs.install_dir }}" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
                 cmake --build . -j
                 cmake --install .
 

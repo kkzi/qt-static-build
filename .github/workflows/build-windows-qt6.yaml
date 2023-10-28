@@ -51,7 +51,7 @@ jobs:
               working-directory: "${{ inputs.src_dir }}"
               shell: pwsh
               run: |
-                curl -s https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -o v${{ inputs.tag }}.zip
+                curl https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -o v${{ inputs.tag }}.zip
                 7z x v${{ inputs.tag }}.zip -y
                 dir
 

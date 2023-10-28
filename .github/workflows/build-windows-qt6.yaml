@@ -46,14 +46,13 @@ jobs:
               run: |
                 mkdir -p ${{ inputs.src_dir }}
                 mkdir -p ${{ inputs.install_dir }}
-                choco install wget unzip
 
             - name: Download Qt
               working-directory: "${{ inputs.src_dir }}"
               shell: pwsh
               run: |
-                wget https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip
-                unzip v${{ inputs.tag }}.zip
+                curl -s https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -o v${{ inputs.tag }}.zip
+                7z x v${{ inputs.tag }}.zip -y
                 dir
 
             - name: Build

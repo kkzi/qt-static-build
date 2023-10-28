@@ -2,8 +2,8 @@ name: Build Qt6 Windows
 on:
     workflow_dispatch:
         inputs:
-            tab:
-                description: 'Build tab'
+            tag:
+                description: 'Build tag'
                 required: true
                 type: string
                 default: '6.6.0'

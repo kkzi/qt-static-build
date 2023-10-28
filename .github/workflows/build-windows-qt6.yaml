@@ -38,13 +38,6 @@ jobs:
                 mkdir -p ${{ inputs.src_dir }}
                 mkdir -p ${{ inputs.install_dir }}
 
-            - name: Download Qt
-              working-directory: "${{ inputs.src_dir }}"
-              shell: pwsh
-              run: |
-                curl https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -ov${{ inputs.tag }}.zip
-                7z x v${{ inputs.tag }}.zip -y
-                dir
 
             - name: Download Qt
               uses: blauqs/actions-download-asset@v1.2

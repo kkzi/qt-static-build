@@ -24,10 +24,6 @@ on:
                 required: true
                 type: string
                 default: 'C:/Local/Qt6'
-            configure-args:
-                description: 'Build args'
-                required: false
-                type: string
 
 jobs:
     build:
@@ -49,6 +45,15 @@ jobs:
                 curl https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip -ov${{ inputs.tag }}.zip
                 7z x v${{ inputs.tag }}.zip -y
                 dir
+
+            - name: Download Qt
+              uses: blauqs/actions-download-asset@v1.2
+              with:
+                repo: qt/qtbase 
+                version: ${{ inputs.tag }}
+                prefix: v
+                file: v${{ inputs.tag }}.zip
+                unpack: true
 
             - name: Set up Visual Studio shell on Windows
               uses: egor-tensin/vs-shell@v2

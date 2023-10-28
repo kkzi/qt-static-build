@@ -2,11 +2,11 @@ name: Build Qt6 Windows
 on:
     workflow_dispatch:
         inputs:
-            version:
+            tab:
                 description: 'Build version'
                 required: true
                 type: string
-                default: 'dev'
+                default: '6.6.0'
             arch:
                 description: 'Build arch'
                 type: choice
@@ -48,17 +48,19 @@ jobs:
                 mkdir -p ${{ inputs.install_dir }}
 
             - name: Download Qt
-              working-directory: "${{ inputs.src_dir }}"
-              shell: pwsh
-              run: | 
-                git clone https://github.com/qt/qtbase.git -b ${{ inputs.version }} ${{ inputs.src_dir }}
-                cd ${{ inputs.src_dir }}
+              uses: Legion2/download-release-action@v2.1.0
+              with: 
+                repository: qt/qtbase
+                tag: ${{ inputs.tag }}
+                path: ${{ inputs.src_dir }}
 
             - name: Build
               working-directory: "${{ inputs.src_dir }}"
               shell: pwsh
               run: |
                 cd ${{ inputs.src_dir }}
+                dir
+                unzip v${{ inputs.tag }}.zip
                 dir
                 .\configure.bat -prefix "${{ inputs.install_dir }}" -static -static-runtime -debug-and-release -confirm-license -opensource -optimize-size -c++std c++20
                 cmake --build . -j
@@ -68,8 +70,8 @@ jobs:
               working-directory: "D:/"
               shell: pwsh
               run: |
-                7z a -t7z qt-${{inputs.version}}-${{inputs.arch}}-static.7z "${{ inputs.install_dir }}/*"
+                7z a -t7z qt-${{inputs.tag}}-${{inputs.arch}}-static.7z "${{ inputs.install_dir }}/*"
 
             - uses: actions/upload-artifact@v3
               with:
-                  path: "D:/qt-${{inputs.version}}-${{inputs.arch}}-static.7z"
+                  path: "D:/qt-${{inputs.tag}}-${{inputs.arch}}-static.7z"

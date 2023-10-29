@@ -72,8 +72,8 @@ jobs:
               working-directory: "D:/"
               shell: pwsh
               run: |
-                7z a -t7z qt-${{inputs.tag}}-${{inputs.arch}}-static.7z "${{ inputs.install_dir }}/*"
+                7z a -t7z qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z "${{ inputs.install_dir }}/*"
 
             - uses: actions/upload-artifact@v3
               with:
-                  path: "D:/qt-${{inputs.tag}}-${{inputs.arch}}-static.7z"
+                  path: "D:/qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z"

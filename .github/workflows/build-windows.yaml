@@ -9,7 +9,7 @@ on:
                 default: '5.15.2'
             configure-args:
                 description: 'Build args'
-                required: true
+                required: false
                 type: string
             modules:
                 description: 'Build modules'
@@ -45,7 +45,7 @@ jobs:
               working-directory: "D:/"
               shell: pwsh
               run: | 
-                git clone https://github.com/qt/qt5.git D:/qt-source
+                git clone https://github.com/qt/qt5.git D:/qt-source --recursive
                 cd qt-source
                 git checkout v${{ inputs.version }}
                 perl init-repository -f --module-subset=${{ inputs.modules }}

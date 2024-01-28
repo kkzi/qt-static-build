@@ -40,9 +40,10 @@ jobs:
 
         steps:
             - name: Setup Environment
-              working-directory: "C:/"
+              working-directory: "D:/"
               shell: pwsh
               run: |
+                Get-Volume
                 mkdir -p ${{ inputs.src_dir }}
                 mkdir -p ${{ inputs.install_dir }}
                 choco install -y --no-progress wget unzip

@@ -35,24 +35,24 @@ jobs:
                   arch: ${{ inputs.arch }}
             
             - name: Setup Environment
-              working-directory: "C:/"
+              working-directory: "D:/"
               shell: pwsh
               run: |
-                mkdir C:/qt-source
+                mkdir D:/qt-source
                 choco install -y jom sed
             
             - name: Download Qt
-              working-directory: "C:/"
+              working-directory: "D:/"
               shell: pwsh
               run: | 
-                git clone https://github.com/qt/qt5.git C:/qt-source
+                git clone https://github.com/qt/qt5.git D:/qt-source
                 cd qt-source
                 git checkout v${{ inputs.version }}
                 perl init-repository -f --module-subset=${{ inputs.modules }}
                 sed -i s/-MD/-MT/g qtbase/mkspecs/common/msvc-desktop.conf
 
             - name: Build
-              working-directory: "C:/qt-source"
+              working-directory: "D:/qt-source"
               shell: pwsh
               run: |
                 mkdir build

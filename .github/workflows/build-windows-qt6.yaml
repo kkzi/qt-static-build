@@ -76,9 +76,9 @@ jobs:
                 7z a -t7z qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z "${{ inputs.install_dir }}/*"
 
             - name: Upload
+              shell: pwsh
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                set -e
                 curl -Lo upload.sh https://github.com/probonopd/uploadtool/raw/master/upload.sh
                 bash upload.sh D:/qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z

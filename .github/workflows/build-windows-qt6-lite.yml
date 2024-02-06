@@ -1,0 +1,161 @@
+
+name: Build Qt6 Lite
+
+on:
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Build tag'
+                required: true
+                type: string
+                default: '6.6.0'
+            mode:
+                description: 'Build Target Mode'
+                required: true
+                type: choice
+                options:
+                - release
+                - debug
+                - debug-and-release
+            arch:
+                description: 'Build arch'
+                type: choice
+                options:
+                  - x64
+                  - x86
+                required: true
+            src_dir:
+                description: 'Download Qt Source Directory'
+                required: true
+                type: string
+                default: 'D:/Qt6/qtbase'
+            install_dir:
+                description: 'Install Qt Libs Directory'
+                required: true
+                type: string
+                default: 'C:/Local/Qt6'
+
+jobs:
+    build:
+        name: Build
+        runs-on: windows-2019
+
+        steps:
+            - name: Setup Environment
+              working-directory: "D:/"
+              shell: pwsh
+              run: |
+                Get-Volume
+                mkdir -p ${{ inputs.src_dir }}
+                mkdir -p ${{ inputs.install_dir }}
+                choco install -y --no-progress wget unzip
+
+            - name: Download Qt
+              working-directory: "${{ inputs.src_dir }}"
+              shell: pwsh
+              run: |
+                wget -qq https://github.com/qt/qtbase/archive/refs/tags/v${{ inputs.tag }}.zip
+                7z x v${{ inputs.tag }}.zip -y
+
+            - name: Set up Visual Studio shell on Windows
+              uses: egor-tensin/vs-shell@v2
+              with:
+                  arch: ${{ inputs.arch }}
+
+            - name: Build
+              working-directory: "${{ inputs.src_dir }}/qtbase-${{ inputs.tag }}"
+              shell: pwsh
+              run: |
+                cd ${{ inputs.src_dir }}/qtbase-${{ inputs.tag }}
+                .\configure -prefix "${{ inputs.install_dir }}" -static -static-runtime -${{ inputs.mode }} -confirm-license -opensource -c++std c++20 \
+                    -libexecdir bin \
+                    -skip qt3d \
+                    -skip qt5compat \
+                    -skip qtactiveqt \
+                    -skip qtcharts \
+                    -skip qtcoap \
+                    -skip qtconnectivity \
+                    -skip qtdatavis3d \
+                    -skip qtdoc \
+                    -skip qtlottie \
+                    -skip qtmultimedia \
+                    -skip qtmqtt \
+                    -skip qtnetworkauth \
+                    -skip qtopcua \
+                    -skip qtpositioning \
+                    -skip qtquick3d \
+                    -skip qtquicktimeline \
+                    -skip qtremoteobjects \
+                    -skip qtscxml \
+                    -skip qtsensors \
+                    -skip qtserialbus \
+                    -skip qtserialport \
+                    -skip qtvirtualkeyboard \
+                    -skip qtwayland \
+                    -skip qtwebchannel \
+                    -skip qtwebengine \
+                    -skip qtwebsockets \
+                    -skip qtwebview \
+                    -no-dbus \
+                    -no-directfb \
+                    -no-cups \
+                    -no-eglfs \
+                    -no-evdev \
+                    -no-eventfd \
+                    -no-journald \
+                    -no-glib \
+                    -no-gtk \
+                    -no-inotify \
+                    -no-mtdev \
+                    -no-pch \
+                    -no-sctp \
+                    -no-securetransport \
+                    -no-syslog \
+                    -no-tslib \
+                    -no-widgets \
+                    -no-feature-relocatable \
+                    -no-feature-brotli \
+                    -no-feature-concurrent \
+                    -no-feature-libudev \
+                    -no-feature-sql \
+                    -no-feature-eglfs \
+                    -no-feature-pdf \
+                    -no-feature-textodfwriter \
+                    -no-feature-vnc \
+                    -no-feature-whatsthis \
+                    -no-feature-gssapi \
+                    -no-feature-printer \
+                    -no-feature-qml-network \
+                    -no-feature-qml-preview \
+                    -no-feature-quick-animatedimage \
+                    -no-feature-quick-canvas \
+                    -no-feature-quick-designer \
+                    -no-feature-distancefieldgenerator \
+                    -no-feature-kmap2qmap \
+                    -no-feature-pixeltool \
+                    -no-feature-qdbus \
+                    -no-feature-qev \
+                    -no-feature-qtattributionsscanner \
+                    -no-feature-qtdiag \
+                    -no-gif \
+                    -no-ico \
+                    -qt-libpng \
+                    -nomake examples \
+                    -nomake tests \
+                
+                cmake --build . -j
+                cmake --install .
+
+            - name: Package output files
+              working-directory: "D:/"
+              shell: pwsh
+              run: |
+                7z a -t7z qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z "${{ inputs.install_dir }}/*"
+
+            - name: Upload
+              shell: pwsh
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                curl -Lo upload.sh https://github.com/probonopd/uploadtool/raw/master/upload.sh
+                bash upload.sh D:/qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z

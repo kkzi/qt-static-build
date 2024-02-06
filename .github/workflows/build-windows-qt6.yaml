@@ -75,6 +75,10 @@ jobs:
               run: |
                 7z a -t7z qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z "${{ inputs.install_dir }}/*"
 
-            - uses: actions/upload-artifact@v3
-              with:
-                  path: "D:/qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z"
+            - name: Upload
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                set -e
+                curl -Lo upload.sh https://github.com/probonopd/uploadtool/raw/master/upload.sh
+                bash upload.sh D:/qt-${{inputs.tag}}-${{inputs.arch}}-${{inputs.mode}}-static.7z
